@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function () {
+
+            //TODO: url
+            var url = "mp3/Cam Cole - So Blues.mp3"
+            song = new Audio(url)
+            var volume = $('.volume')
+            var duration = song.duration
+            //TODO: заменить картинку проигрывание и пауза
+            $(document).on("click", "#start", function() {
+                    console.log('start')
+                    initAudio()
+                    $('#start').replaceWith( ' <input type="image" id="stop"'
+                    +'src="images/btn_pause.png" width="30" height="30" style="float: left; margin-top: -8px;">')
+            })
+            $(document).on("click", "#stop", function() {
+                console.log('stop')
+                song.pause()
+                $('#stop').replaceWith( ' <input type="image" id="start"'
+                    +'src="images/btn_play.png" width="30" height="30" style="float: left; margin-top: -8px;">')
+            });
+
+            function secondsTimeSpanToHMS(s) {
+                var h = Math.floor(s / 3600)
+                s -= h * 3600
+                var m = Math.floor(s / 60)
+                s -= m * 60
+                return h + ":" + (m < 10 ? '0' + m : m) + ":" + (s < 10 ? '0' + s : s)
+            }
+
+            function initAudio() {
+                var intervals = []
+                var start_time = 0
+                $("#slider").slider("option", "max", song.duration)
+                song.addEventListener('timeupdate', function () {
+                    var rewind = { start_time: "", end_time: "" }
+                    var curtime = parseInt(song.currentTime, 10)
+                    if (curtime - start_time > 10) {
+                        rewind.start_time = start_time
+                        rewind.end_time = curtime
+                        intervals.push(rewind)
+                        console.log(rewind)
+                    }
+                    start_time = curtime
+                    var time = secondsTimeSpanToHMS(curtime)
+                    $("#silder_val").val(time)
+                    $("#slider").slider('value', curtime)
+                })
+                song.play()
+            }
+
+            $("#slider").slider({
+                range: 'min',
+                min: 0, max: 10,
+                start: function (event, ui) {
+                },
+                slide: function (event, ui) {
+                    song.currentTime = ui.value
+                },
+                stop: function (event, ui) { },
+            })
+
+            $("#volume").slider({
+                range: "min",
+                min: 1,
+                max: 100,
+                value: 100,
+                slide: function (event, ui) {
+                    $("#volume_val").val(ui.value)
+                    song.volume = ui.value / 100
+                }
+            })
+        })
+    </script>
+</head>
+<style type="text/css">
+    .ui-state-default,
+    .ui-widget-content {
+        border: 1px solid #c5c5c5;
+        font-weight: normal;
+        color: blue;
+        border-radius: 20px;
+    }
+
+    .ui-slider {
+        background: rgb(150, 145, 145) !important;
+    }
+
+    .ui-slider-range {
+        background: white !important;
+    }
+</style>
+
+<body>
+    <div style="width: 530px; height: 10px; background:#424242;
+    padding: 10px 10px 15px 10px; border-radius: 5px;">
+        <input type="image" id="start" src="images/btn_play.png" width="30" height="30"
+            style="float: left; margin-top: -8px;">
+        <div id="slider" style="width: 300px; float: left; margin-left: 10px;"></div>
+        <input type="text" id="silder_val" readonly style="border:0; color:white; 
+            font-weight:bold; width: 60px; float: left;
+            background-color:#424242!important; margin-left: 12px; 
+            font-size: 15px; margin-top: -1px;">
+        <img src="images/volume.png" style="float: left; margin-top: -5px;">
+        <div id="volume" style="width: 30px; float:left"></div>
+        <input type="text" id="volume_val" readonly style="border:0; color:white;
+        font-weight:bold; width: 30px; float: left;
+        background-color:#424242!important; margin-left: 12px; 
+        font-size: 15px; margin-top: -1px;">
+    </div>
+</body>
+
+</html>
